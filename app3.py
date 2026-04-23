@@ -44,7 +44,6 @@ with st.sidebar:
     )
     st.markdown("---")
     st.info("Aplikasi Evaluasi Kesiapan Kerja & Estimasi Gaji Mahasiswa B28.")
-    st.caption("Developed by: Kang Nicholas Darren Nugroho")
 
 # ==========================================
 # 4. HALAMAN 1: BERANDA
