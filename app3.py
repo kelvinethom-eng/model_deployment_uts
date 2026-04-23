@@ -88,25 +88,49 @@ elif menu == "🔮 Prediksi":
             submitted = st.form_submit_button("Analisis Sekarang")
 
         if submitted:
-            # Bangun DataFrame (Pastikan urutan dan nama kolom sama dengan X_train)
-            input_df = pd.DataFrame([{
-                'cgpa': cgpa, 'tenth_percentage': tenth, 'twelfth_percentage': twelfth,
-                'backlogs': backlogs, 'study_hours_per_day': study_h,
-                'attendance_percentage': attendance, 'projects_completed': projects,
-                'internships_completed': internships, 'coding_skill_rating': coding,
-                'communication_skill_rating': comm, 'aptitude_skill_rating': aptitude,
-                'hackathons_participated': hackathons, 'certifications_count': certs,
-                'sleep_hours': sleep, 'stress_level': stress, 'gender': gender,
-                'branch': branch, 'part_time_job': part_time, 'family_income_level': income,
-                'city_tier': city, 'internet_access': internet, 'extracurricular_involvement': extra
-            }])
+    # 1. Buat Mapping (Kamus Angka)
+    # Pastikan angka ini (0, 1, 2) sama dengan yang Anda gunakan saat training
+    stress_map = {"Low": 0, "Medium": 1, "High": 2}
+    income_map = {"Low": 0, "Medium": 1, "High": 2}
+    extra_map = {"None": 0, "Low": 1, "High": 2}
 
-            # Tambahkan fitur engineering jika diperlukan
-            input_df['total_skill_rating'] = coding + comm + aptitude
+    # 2. Susun DataFrame dengan Nilai yang Sudah Jadi Angka
+    input_df = pd.DataFrame([{
+        'cgpa': cgpa,
+        'tenth_percentage': tenth_perc,
+        'twelfth_percentage': twelfth_perc,
+        'backlogs': backlogs,
+        'study_hours_per_day': study_h,
+        'attendance_percentage': attendance,
+        'projects_completed': projects,
+        'internships_completed': internships,
+        'coding_skill_rating': coding,
+        'communication_skill_rating': comm,
+        'aptitude_skill_rating': aptitude,
+        'hackathons_participated': hackathons,
+        'certifications_count': certs,
+        'sleep_hours': sleep,
+        
+        # UBAH DISINI: Gunakan .get() untuk mengambil angkanya
+        'stress_level': stress_map.get(stress), 
+        'family_income_level': income_map.get(income),
+        'extracurricular_involvement': extra_map.get(extra),
+        
+        # Sisanya biarkan teks jika memang masuk categorical nominal di datatrain.py
+        'gender': gender,
+        'branch': branch,
+        'part_time_job': part_time,
+        'city_tier': city,
+        'internet_access': internet
+    }])
 
-            res = model.predict(input_df)[0]
-            if res == 1 or str(res).lower() == 'placed':
-                st.success("✅ Prediksi: PLACED (Ditempatkan)")
-                st.balloons()
-            else:
-                st.warning("⚠️ Prediksi: NOT PLACED (Belum Ditempatkan)")   
+    # 3. Tambahkan Fitur Baru (Total Skill)
+    # Model Anda kemungkinan besar butuh ini karena ada di pipleine.py
+    input_df['total_skill_rating'] = coding + comm + aptitude
+
+    # 4. Prediksi
+    try:
+        res = model.predict(input_df)[0]
+        # ... tampilkan hasil ...
+    except Exception as e:
+        st.error(f"Error Prediksi: {e}")
