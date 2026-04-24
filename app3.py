@@ -76,20 +76,29 @@ if selection == "🏠 Beranda":
 elif selection == "📊 Visualisasi Data":
     st.title("📊 Eksplorasi Data Mahasiswa")
     try:
-        df = pd.read_csv('A.csv')
+        # 1. Load kedua file
+        df_f = pd.read_csv('A.csv')
+        df_t = pd.read_csv('A_targets.csv')
+        
+        # 2. Gabungkan berdasarkan Student_ID agar kolom salary_lpa muncul
+        df = pd.merge(df_f, df_t, on='Student_ID')
+        
         col_a, col_b = st.columns(2)
         with col_a:
             st.write("**Hubungan CGPA vs Salary**")
             fig, ax = plt.subplots()
+            # Sekarang salary_lpa sudah ada di df hasil merge
             sns.scatterplot(data=df, x='cgpa', y='salary_lpa', hue='placement_status', ax=ax)
             st.pyplot(fig)
+            
         with col_b:
             st.write("**Distribusi Status Penempatan**")
             fig, ax = plt.subplots()
-            df['placement_status'].value_counts().plot.pie(autopct='%1.1f%%', ax=ax, colors=['#ff9999','#66b3ff'])
+            df['placement_status'].value_counts().plot.pie(autopct='%1.1f%%', ax=ax)
             st.pyplot(fig)
+            
     except Exception as e:
-        st.error(f"Gagal memuat data visualisasi (A.csv): {e}")
+        st.error(f"Gagal memuat data visualisasi: {e}")
 
 # ==========================================
 # 6. HALAMAN 3: PREDIKSI (KALKULATOR GANDA)
